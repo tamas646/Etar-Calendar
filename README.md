@@ -1,4 +1,3 @@
-![Etar Calendar](metadata/en-US/images/featureGraphic.png)
 # Etar Calendar
 Etar (from Arabic:  `إِيتَار`)  is an open source material designed calendar made for everyone!
 
@@ -17,12 +16,13 @@ this app would be just a dream. So thanks to them!
 
 ## Features
 - Month view.
-- Week, day & agenda view.
+- Week, day and agenda view.
 - view task on day, week, month and agenda view
-- Uses Android calendar sync. Works with Google Calendar, Exchange, etc.
-- Material designed.
+- Uses Android calendar storage to show all synchronized calendars.
+- Dark and light theme.
 - Support offline calendar.
-- Agenda and task widget.
+- Agenda widget.
+- Support sharing calendars via ICS and the ability to import/export from SD card.
 - Multilingual UI.
 
 ## How to use Etar
@@ -36,8 +36,6 @@ Sync your calendar to a server:
   usable from different devices.) To sync such a calendar to some server you
   need yet another app, e. g. DAVx5. That’s necessary because a Caldav client
   isn't included in Etar.
-
-  The following [link](https://ownyourbits.com/2017/12/30/sync-nextcloud-tasks-calendars-and-contacts-on-your-android-device/) provides a tutorial how to use Nextcloud + DAVx5 + Etar.
 
 ### Technical explanation
 On Android there are "Calendar providers". These can be calendars that are

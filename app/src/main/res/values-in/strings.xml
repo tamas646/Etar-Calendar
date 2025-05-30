@@ -17,10 +17,10 @@
     <string name="when_label" msgid="894636567327261599">Waktu</string>
     <string name="today" msgid="8577375020252453006">"Hari ini"</string>
     <string name="tomorrow" msgid="614434811813859237">"Besok"</string>
-    <string name="today_at_time_fmt" msgid="1981279213130049736">Hari ini pada jam <xliff:g id="time_interval">%s</xliff:g></string>
-    <string name="tomorrow_at_time_fmt" msgid="1330779112841767432">Besok pada jam <xliff:g id="time_interval">%s</xliff:g></string>
+    <string name="today_at_time_fmt" msgid="1981279213130049736">Hari ini pada pukul <xliff:g id="time_interval">%s</xliff:g></string>
+    <string name="tomorrow_at_time_fmt" msgid="1330779112841767432">Besok pada pukul <xliff:g id="time_interval">%s</xliff:g></string>
     <string name="date_time_fmt" msgid="1642972650061946484"><xliff:g id="date">%1$s</xliff:g>, <xliff:g id="time_interval">%2$s</xliff:g></string>
-    <string name="no_title_label" msgid="302177118061368042">"(Tanpa judul)"</string>
+    <string name="no_title_label" msgid="302177118061368042">(Tiada judul)</string>
     <plurals name="Nminutes">
         <item quantity="other"><xliff:g id="count">%d</xliff:g> menit</item>
     </plurals>
@@ -71,8 +71,6 @@
     <string name="privacy_label" msgid="9215031965259597335">Pribadi</string>
     <string name="reminders_label" msgid="7292389181815525676">Tambah pengingat</string>
     <string name="no_syncable_calendars" msgid="7019488867045436129">Tidak ada kalender</string>
-    <string name="no_calendars_found" msgid="8968682716053492187">Sebelum Anda bisa menambahkan acara, Anda harus menambahkan setidaknya satu akun Kalender ke perangkat dan buat kalender terlihat. Sentuh Tambah Akun untuk menambah akun (jika Anda baru saja menambahkan akun, tunggu sampai akun selesai disinkronkan dan coba lagi). Atau sentuh Batal dan pastikan setidaknya satu kalender terlihat.</string>
-    <string name="add_account" msgid="1669072099756774952">Tambah akun</string>
     <string name="view_event_calendar_label" msgid="6126231656338241140">"Kalender:"</string>
     <string name="view_event_organizer_label" msgid="2753151795647402277">"Penyelenggara:"</string>
     <string name="choose_event_color_label" msgid="2192923501857428854">"Pilih warna acara"</string>
@@ -219,10 +217,10 @@
     <string name="visibility_default">Bawaan</string>
     <string name="visibility_private">Pribadi</string>
     <string name="visibility_public">Publik</string>
-    <string name="goto_date">Kunjungi…</string>
-    <string name="rsvp_accepted">Merespons ya.</string>
-    <string name="rsvp_tentative">Merespons mungkin.</string>
-    <string name="rsvp_declined">Merespons tidak.</string>
+    <string name="goto_date">Lihat tanggal…</string>
+    <string name="rsvp_accepted">Merespons dengan \"ya\".</string>
+    <string name="rsvp_tentative">Merespons dengan \"mungkin\".</string>
+    <string name="rsvp_declined">Merespons dengan \"tidak\".</string>
     <string name="preferences_theme">Tema</string>
     <string name="preferences_light_theme">Terang</string>
     <string name="preferences_dark_theme">Gelap</string>
@@ -320,7 +318,7 @@
     <string name="preferences_list_add_remote_etesync">Tambah kalender EteSync</string>
     <string name="preferences_pure_black_night_mode">Mode malam hitam pekat</string>
     <string name="foreground_notification_channel_name">Proses latar belakang</string>
-    <string name="foreground_notification_channel_description">Notifikasi dibutuhkan untuk sinkronisasi internal. Anda bisa menyembunyikan kanal ini.</string>
+    <string name="foreground_notification_channel_description">Notifikasi dibutuhkan untuk penyinkronan internal. Anda dapat menyembunyikan kanal ini.</string>
     <string name="no_reminder_label">Tak Satu Pun</string>
     <plurals name="Nweeks">
         <item quantity="other"><xliff:g id="count">%d</xliff:g> minggu</item>
@@ -330,4 +328,15 @@
     <string name="preferences_real_event_colors">Gunakan warna acara asli</string>
     <string name="menu_info">Info</string>
     <string name="duplicate_label">Duplikat</string>
+    <string name="hint_url">URL</string>
+    <string name="no_calendars_found">Sebelum Anda bisa menambahkan acara, Anda harus menambahkan setidaknya satu kalender ke perangkat Anda</string>
+    <string name="add_calendar">Tambah kalender</string>
+    <string name="preferences_manage_notifications">Kelola notifikasi</string>
+    <string name="preferences_do_not_check_battery_optimization">Jangan periksa pengoptimalan baterai</string>
+    <string name="calendars">Kalender</string>
+    <string name="preferences_do_not_check_battery_optimization_summary">Gunakan dengan risiko Anda sendiri! Notifikasi tidak akan berfungsi lagi, widget tidak lagi diperbarui dan layanan latar belakang akan mogok. Namun Anda tidak akan ditanya lagi apakah ingin mengaktifkan layanan latar belakang.</string>
+    <string name="no_snooze_label">Nihil</string>
+    <string name="cancel">Batal</string>
+    <string name="discard_event_changes">Apakah Anda ingin membuang perubahan?</string>
+    <string name="discard">Buang</string>
 </resources>

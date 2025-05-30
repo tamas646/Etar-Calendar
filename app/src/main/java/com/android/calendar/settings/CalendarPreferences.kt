@@ -25,6 +25,7 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.provider.CalendarContract
+import android.provider.Settings
 import android.util.TypedValue
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -34,7 +35,8 @@ import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import com.android.calendar.Utils
-import com.android.calendar.persistence.CalendarRepository
+import com.android.calendar.alerts.channelId
+import com.android.calendar.persistence.ICalendarRepository
 import com.android.calendar.persistence.tasks.DmfsOpenTasksContract
 import ws.xsoh.etar.R
 
@@ -42,15 +44,16 @@ import ws.xsoh.etar.R
 class CalendarPreferences : PreferenceFragmentCompat() {
 
     private var calendarId: Long = -1
+
     private var isTask: Boolean = false;
-    private lateinit var calendarRepository: CalendarRepository
+    private lateinit var calendarRepository: ICalendarRepository
     private lateinit var account: Account
     private var numberOfEvents: Long = -1
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         calendarId = requireArguments().getLong(ARG_CALENDAR_ID)
         isTask = requireArguments().getBoolean(ARG_IS_TASKS)
-        calendarRepository = CalendarRepository(requireActivity().application)
+        calendarRepository = ICalendarRepository.get(requireActivity().application)
         account = calendarRepository.queryAccount(calendarId, isTask)!!
         numberOfEvents = calendarRepository.queryNumberOfEvents(calendarId, isTask)!!
 
@@ -147,11 +150,23 @@ class CalendarPreferences : PreferenceFragmentCompat() {
             isSelectable = false
         }
 
-
         if (!isLocalAccount) {
             screen.addPreference(synchronizePreference)
         }
+
         screen.addPreference(visiblePreference)
+
+        if(Utils.isOreoOrLater()){
+            val notificationPreference = Preference(context).apply {
+                title = getString(R.string.preferences_manage_notifications)
+                intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS).apply {
+                    putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                    putExtra(Settings.EXTRA_CHANNEL_ID, channelId(this@CalendarPreferences.calendarId))
+                }
+            }
+            screen.addPreference(notificationPreference)
+        }
+
         screen.addPreference(colorPreference)
         if (isLocalAccount && !isTask) {
             screen.addPreference(displayNamePreference)

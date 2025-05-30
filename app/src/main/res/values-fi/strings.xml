@@ -39,9 +39,9 @@
     </plurals>
     <plurals name="weekN">
         <item quantity="one">Viikko <xliff:g id="count">%d</xliff:g></item>
-        <item quantity="other"></item>
+        <item quantity="other"/>
     </plurals>
-    <string name="calendar_refresh" msgid="6172731193680500025">"Päivitä"</string>
+    <string name="calendar_refresh" msgid="6172731193680500025">Virkistä</string>
     <string name="show_day_view" msgid="5782512782605466016">"Näytä päivä"</string>
     <string name="agenda_view" msgid="5566084759423843245">"Tapahtumat"</string>
     <string name="day_view" msgid="4467754504843584437">"Päivä"</string>
@@ -76,8 +76,6 @@
     <string name="privacy_label" msgid="9215031965259597335">"Tietosuoja"</string>
     <string name="reminders_label" msgid="7292389181815525676">"Lisää muistutus"</string>
     <string name="no_syncable_calendars" msgid="7019488867045436129">"Ei kalentereita"</string>
-    <string name="no_calendars_found" msgid="8968682716053492187">"Ennen kuin voit lisätä tapahtuman, sinun on lisättävä laitteeseen vähintään yksi kalenteritili ja otettava kalenteri näkyviin. Lisää tili koskettamalla Lisää tili (jos olet jo lisännyt tilin, odota synkronoinnin valmistumista ja yritä uudelleen). Tai kosketa Peruuta ja varmista, että vähintään yksi kalenteri on näkyvissä."</string>
-    <string name="add_account" msgid="1669072099756774952">"Lisää tili"</string>
     <string name="view_event_calendar_label" msgid="6126231656338241140">"Kalenteri:"</string>
     <string name="view_event_organizer_label" msgid="2753151795647402277">"Järjestäjä:"</string>
     <string name="choose_event_color_label" msgid="2192923501857428854">"Valitse tapahtuman väri"</string>

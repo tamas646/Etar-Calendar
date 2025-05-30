@@ -17,11 +17,10 @@
 
 package com.android.calendar.alerts;
 
-import static com.android.calendar.alerts.AlertService.ALERT_CHANNEL_ID;
-
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
@@ -48,15 +47,14 @@ import android.text.style.TextAppearanceSpan;
 import android.text.style.URLSpan;
 import android.util.Log;
 import android.widget.Toast;
-
+import androidx.annotation.Nullable;
 import com.android.calendar.DynamicTheme;
+import com.android.calendar.EventInfoActivity;
 import com.android.calendar.Utils;
 import com.android.calendar.alerts.AlertService.NotificationWrapper;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
 import ws.xsoh.etar.R;
 
 /**
@@ -134,6 +132,9 @@ public class AlertReceiver extends BroadcastReceiver {
 
             if (pm.isIgnoringBatteryOptimizations(context.getPackageName())) {
                 if (Utils.isOreoOrLater()) {
+                    if (Utils.isUpsideDownCakeOrLater() && !Utils.canScheduleAlarms(context)) {
+                        return;
+                    }
                     context.startForegroundService(intent);
                 } else {
                     context.startService(intent);
@@ -141,6 +142,7 @@ public class AlertReceiver extends BroadcastReceiver {
             } else {
                 Log.d(TAG, "Battery optimizations are not disabled");
             }
+
         }
     }
 
@@ -159,9 +161,13 @@ public class AlertReceiver extends BroadcastReceiver {
     }
 
     private static PendingIntent createClickEventIntent(Context context, long eventId,
-            long startMillis, long endMillis, int notificationId) {
-        return createDismissAlarmsIntent(context, eventId, startMillis, endMillis, notificationId,
-                DismissAlarmsService.SHOW_ACTION);
+        int notificationId, long startMillis, long endMillis) {
+        Intent intent = AlertUtils.buildEventViewIntent(context, eventId, startMillis, endMillis);
+        intent.putExtra(AlertUtils.NOTIFICATION_ID_KEY, notificationId);
+        return TaskStackBuilder.create(context)
+            .addParentStack(EventInfoActivity.class)
+            .addNextIntent(intent)
+            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT | Utils.PI_FLAG_IMMUTABLE);
     }
 
     private static PendingIntent createDeleteEventIntent(Context context, long eventId,
@@ -192,8 +198,16 @@ public class AlertReceiver extends BroadcastReceiver {
         return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | Utils.PI_FLAG_IMMUTABLE);
     }
 
+    // if default snooze minute < 0, means the snooze option is disable
+    // in this case return null as intent
+    @Nullable
     private static PendingIntent createSnoozeIntent(Context context, long eventId,
             long startMillis, long endMillis, int notificationId) {
+
+        if (Utils.getDefaultSnoozeDelayMs(context) < 0L) {
+            return null;
+        }
+
         Intent intent = new Intent();
         intent.putExtra(AlertUtils.EVENT_ID_KEY, eventId);
         intent.putExtra(AlertUtils.EVENT_START_KEY, startMillis);
@@ -223,10 +237,10 @@ public class AlertReceiver extends BroadcastReceiver {
     }
 
     public static NotificationWrapper makeBasicNotification(Context context, String title,
-            String summaryText, long startMillis, long endMillis, long eventId,
+            String summaryText, long startMillis, long endMillis, long eventId, long calendarId,
             int notificationId, boolean doPopup, int priority) {
         Notification n = buildBasicNotification(new Notification.Builder(context),
-                context, title, summaryText, startMillis, endMillis, eventId, notificationId,
+                context, title, summaryText, startMillis, endMillis, eventId, calendarId, notificationId,
                 doPopup, priority, false);
         return new NotificationWrapper(n, notificationId, eventId, startMillis, endMillis, doPopup);
     }
@@ -240,7 +254,7 @@ public class AlertReceiver extends BroadcastReceiver {
 
     private static Notification buildBasicNotification(Notification.Builder notificationBuilder,
             Context context, String title, String summaryText, long startMillis, long endMillis,
-            long eventId, int notificationId, boolean doPopup, int priority,
+            long eventId, long calendarId, int notificationId, boolean doPopup, int priority,
             boolean addActionButtons) {
         Resources resources = context.getResources();
         if (title == null || title.length() == 0) {
@@ -249,8 +263,8 @@ public class AlertReceiver extends BroadcastReceiver {
 
         // Create an intent triggered by clicking on the status icon, that dismisses the
         // notification and shows the event.
-        PendingIntent clickIntent = createClickEventIntent(context, eventId, startMillis,
-                endMillis, notificationId);
+        PendingIntent clickIntent = createClickEventIntent(context, eventId, notificationId,
+            startMillis, endMillis);
 
         // Create a delete intent triggered by dismissing the notification.
         PendingIntent deleteIntent = createDeleteEventIntent(context, eventId, startMillis,
@@ -259,7 +273,7 @@ public class AlertReceiver extends BroadcastReceiver {
         // Create the base notification.
         notificationBuilder.setContentTitle(title);
         notificationBuilder.setContentText(summaryText);
-        notificationBuilder.setSmallIcon(R.drawable.stat_notify_calendar);
+        notificationBuilder.setSmallIcon(R.drawable.stat_notify_calendar_events);
         int color = DynamicTheme.getColorId(DynamicTheme.getPrimaryColor(context));
         notificationBuilder.setColor(context.getResources().getColor(color));
         notificationBuilder.setContentIntent(clickIntent);
@@ -267,7 +281,7 @@ public class AlertReceiver extends BroadcastReceiver {
 
         // Add setting channel ID for Oreo or later
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationBuilder.setChannelId(ALERT_CHANNEL_ID);
+            notificationBuilder.setChannelId(UtilsKt.channelId(calendarId));
         }
 
         if (doPopup) {
@@ -339,10 +353,10 @@ public class AlertReceiver extends BroadcastReceiver {
      */
     public static NotificationWrapper makeExpandingNotification(Context context, String title,
             String summaryText, String description, long startMillis, long endMillis, long eventId,
-            int notificationId, boolean doPopup, int priority) {
+            long calendarId, int notificationId, boolean doPopup, int priority) {
         Notification.Builder basicBuilder = new Notification.Builder(context);
         Notification notification = buildBasicNotification(basicBuilder, context, title,
-                summaryText, startMillis, endMillis, eventId, notificationId, doPopup,
+                summaryText, startMillis, endMillis, eventId, calendarId, notificationId, doPopup,
                 priority, true);
 
         // Create a new-style expanded notification
@@ -670,6 +684,15 @@ public class AlertReceiver extends BroadcastReceiver {
                 geoIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 // If this intent cannot be handled, do not create the map action
                 if (isResolveIntent(context, geoIntent)) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(context);
+                        geoIntent = createMapActivityIntent(context, urlSpans);
+                        if (geoIntent != null) {
+                            taskStackBuilder.addNextIntentWithParentStack(geoIntent);
+                            return taskStackBuilder.getPendingIntent(0,
+                                    PendingIntent.FLAG_UPDATE_CURRENT | Utils.PI_FLAG_IMMUTABLE);
+                        }
+                    }
                     Intent broadcastIntent = new Intent(MAP_ACTION);
                     broadcastIntent.setClass(context, AlertReceiver.class);
                     broadcastIntent.putExtra(EXTRA_EVENT_ID, eventId);
@@ -763,8 +786,11 @@ public class AlertReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
+        if (context == null || intent.getAction() == null)
+            return;
+
         if (AlertService.DEBUG) {
-            Log.d(TAG, "onReceive: a=" + intent.getAction() + " " + intent.toString());
+            Log.d(TAG, "onReceive: a=" + intent.getAction() + " " + intent);
         }
         if (MAP_ACTION.equals(intent.getAction())) {
             // Try starting the map action.
@@ -837,7 +863,10 @@ public class AlertReceiver extends BroadcastReceiver {
     }
 
     private void closeNotificationShade(Context context) {
-        Intent closeNotificationShadeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-        context.sendBroadcast(closeNotificationShadeIntent);
+        // https://developer.android.com/about/versions/12/behavior-changes-all#close-system-dialogs
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            Intent closeNotificationShadeIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            context.sendBroadcast(closeNotificationShadeIntent);
+        }
     }
 }

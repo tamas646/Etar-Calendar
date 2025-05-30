@@ -162,6 +162,8 @@ public class ImportActivity extends Activity {
                 IcalendarUtils.uncleanseString(firstEvent.getProperty(VEvent.URL)));
         calIntent.putExtra(CalendarContract.Events.ORGANIZER,
                 IcalendarUtils.uncleanseString(firstEvent.getProperty(VEvent.ORGANIZER)));
+        calIntent.putExtra(CalendarContract.Events.RRULE,
+                IcalendarUtils.uncleanseString(firstEvent.getProperty(VEvent.RRULE)));
 
         if (firstEvent.mAttendees.size() > 0) {
             StringBuilder builder = new StringBuilder();
@@ -181,9 +183,13 @@ public class ImportActivity extends Activity {
 
         String dtEnd = firstEvent.getProperty(VEvent.DTEND);
         String dtEndParam = firstEvent.getPropertyParameters(VEvent.DTEND);
-        if (!TextUtils.isEmpty(dtEnd)) {
+        if (dtEnd != null && !TextUtils.isEmpty(dtEnd)) {
             calIntent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME,
                     getLocalTimeFromString(dtEnd, dtEndParam));
+        } else {
+            // Treat start date as end date if un-specified
+            dtEnd = dtStart;
+            dtEndParam = dtStartParam;
         }
 
         boolean isAllDay = getLocalTimeFromString(dtEnd, dtEndParam)

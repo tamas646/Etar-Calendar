@@ -54,7 +54,7 @@ class CalendarAppWidgetModel {
     public CalendarAppWidgetModel(Context context, String timeZone) {
         mNow = System.currentTimeMillis();
         Time time = new Time(timeZone);
-        time.set(System.currentTimeMillis()); // This is needed for gmtoff to be set
+        time.set(mNow); // This is needed for gmtoff to be set
         mTodayJulianDay = Time.getJulianDay(mNow, time.getGmtOffset());
         mMaxJulianDay = mTodayJulianDay + CalendarAppWidgetService.MAX_DAYS - 1;
         mEventInfos = new ArrayList<EventInfo>(50);
@@ -63,14 +63,13 @@ class CalendarAppWidgetModel {
         mContext = context;
     }
 
+
     public void buildFromCursor(Cursor cursor, String timeZone, Boolean isTask) {
-        final Time recycle = new Time(timeZone);
         final ArrayList<LinkedList<RowInfo>> mBuckets =
                 new ArrayList<LinkedList<RowInfo>>(CalendarAppWidgetService.MAX_DAYS);
         for (int i = 0; i < CalendarAppWidgetService.MAX_DAYS; i++) {
             mBuckets.add(new LinkedList<RowInfo>());
         }
-        recycle.set(System.currentTimeMillis());
         mShowTZ = !TextUtils.equals(timeZone, Utils.getCurrentTimezone());
         if (mShowTZ) {
             mHomeTZName = TimeZone.getTimeZone(timeZone).getDisplayName(false, TimeZone.SHORT);
@@ -110,6 +109,7 @@ class CalendarAppWidgetModel {
 
             // Adjust all-day times into local timezone
             if (allDay) {
+                final Time recycle = new Time();
                 start = Utils.convertAlldayUtcToLocal(recycle, start, tz);
                 end = Utils.convertAlldayUtcToLocal(recycle, end, tz);
             }
@@ -164,6 +164,7 @@ class CalendarAppWidgetModel {
             if (!bucket.isEmpty()) {
                 // We don't show day header in today
                 if (day != mTodayJulianDay) {
+                    final Time recycle = new Time(timeZone);
                     final DayInfo dayInfo = populateDayInfo(day, recycle);
                     // Add the day header
                     final int dayIndex = mDayInfos.size();
@@ -239,15 +240,16 @@ class CalendarAppWidgetModel {
 
     private DayInfo populateDayInfo(int julianDay, Time recycle) {
         long millis = recycle.setJulianDay(julianDay);
-        int flags = DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_DATE;
+        int flags =
+            DateUtils.FORMAT_ABBREV_ALL |
+            DateUtils.FORMAT_SHOW_DATE |
+            DateUtils.FORMAT_SHOW_WEEKDAY;
 
         String label;
         if (julianDay == mTodayJulianDay + 1) {
-            flags |= DateUtils.FORMAT_SHOW_WEEKDAY;
             label = mContext.getString(R.string.agenda_tomorrow,
                     Utils.formatDateRange(mContext, millis, millis, flags));
         } else {
-            flags |= DateUtils.FORMAT_SHOW_WEEKDAY;
             label = Utils.formatDateRange(mContext, millis, millis, flags);
         }
         return new DayInfo(julianDay, label);
