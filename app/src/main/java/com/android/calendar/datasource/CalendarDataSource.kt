@@ -27,6 +27,7 @@ import android.provider.CalendarContract
 import com.android.calendar.Utils
 import com.android.calendar.persistence.Calendar
 import com.android.calendar.persistence.CalendarRepository
+import com.android.calendar.persistence.tasks.DmfsOpenTasksContract
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -81,7 +82,44 @@ class CalendarDataSource(
                         visible = visible,
                         syncEvents = syncEvents,
                         isPrimary = isPrimary,
-                        isLocal = isLocal
+                        isLocal = isLocal,
+                        isTasks = false
+                    )
+                )
+            }
+        }
+        context.contentResolver.query(
+            DmfsOpenTasksContract.TaskLists.PROVIDER_URI,
+            TASKLIST_PROJECTION,
+            null,
+            null,
+            null
+        )?.use {
+            while (it.moveToNext()) {
+                val id = it.getLong(0)
+                val accountName = it.getString(1)
+                val accountType = it.getString(2)More actions
+                val name = it.getString(4)
+                val displayName = it.getString(4)
+                val color = it.getInt(5)
+                val visible = it.getInt(6) == 1
+                val syncEvents = it.getInt(7) == 1
+                val isPrimary = true
+                val isLocal = accountType == CalendarContract.ACCOUNT_TYPE_LOCAL
+
+                calendars.add(
+                    Calendar(
+                        id = id,
+                        accountName = accountName,
+                        accountType = accountType,
+                        name = name,
+                        displayName = displayName,
+                        color = color,
+                        visible = visible,
+                        syncEvents = syncEvents,
+                        isPrimary = isPrimary,
+                        isLocal = isLocal,
+                        true
                     )
                 )
             }
@@ -270,6 +308,17 @@ class CalendarDataSource(
             CalendarContract.Calendars.SYNC_EVENTS,
             CalendarContract.Calendars.IS_PRIMARY
         )
+        private val TASKLIST_PROJECTION = arrayOf(
+            DmfsOpenTasksContract.TaskLists.COLUMN_ID,
+            DmfsOpenTasksContract.TaskLists.COLUMN_ACCOUNT_NAME,
+            DmfsOpenTasksContract.TaskLists.COLUMN_ACCOUNT_TYPE,
+            DmfsOpenTasksContract.TaskLists.COLUMN_LIST_OWNER,
+            DmfsOpenTasksContract.TaskLists.COLUMN_NAME,
+            DmfsOpenTasksContract.TaskLists.COLUMN_COLOR,
+            DmfsOpenTasksContract.TaskLists.COLUMN_VISIBLE,
+            DmfsOpenTasksContract.TaskLists.COLUMN_SYNC_ENABLE
+        )
+
         private const val PROJECTION_INDEX_ID = 0
         private const val PROJECTION_INDEX_ACCOUNT_NAME = 1
         private const val PROJECTION_INDEX_ACCOUNT_TYPE = 2

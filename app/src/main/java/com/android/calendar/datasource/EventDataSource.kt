@@ -17,6 +17,7 @@
 
 package com.android.calendar.datasource
 
+import com.android.calendar.persistence.tasks.DmfsOpenTasksContract
 import android.app.Application
 import android.provider.CalendarContract
 
@@ -29,15 +30,22 @@ class EventDataSource(
     /**
      * TODO Document
      */
-    fun queryNumberOfEvents(calendarId: Long): Long? {
+    fun queryNumberOfEvents(calendarId: Long, isTask: Boolean): Long? {
         val args = arrayOf(calendarId.toString())
-        application.contentResolver.query(
-            CalendarContract.Events.CONTENT_URI,
-            PROJECTION_COUNT_EVENTS,
-            WHERE_COUNT_EVENTS, args, null
-        )?.use {
-            if (it.moveToFirst()) {
-                return it.getLong(PROJECTION_COUNT_EVENTS_INDEX_COUNT)
+        if (isTask) {
+            val cursor = contentResolver.query(DmfsOpenTasksContract.Tasks.PROVIDER_URI, null, WHERE_COUNT_TASKS, args, null)
+            val count = cursor?.count?.toLong()
+            cursor?.close()
+            return count
+        } else {
+            application.contentResolver.query(
+                CalendarContract.Events.CONTENT_URI,
+                PROJECTION_COUNT_EVENTS,
+                WHERE_COUNT_EVENTS, args, null
+            )?.use {
+                if (it.moveToFirst()) {
+                    return it.getLong(PROJECTION_COUNT_EVENTS_INDEX_COUNT)
+                }
             }
         }
         return null
@@ -49,5 +57,6 @@ class EventDataSource(
         )
         private const val PROJECTION_COUNT_EVENTS_INDEX_COUNT = 0
         private const val WHERE_COUNT_EVENTS = CalendarContract.Events.CALENDAR_ID + "=?"
+        private const val WHERE_COUNT_TASKS = DmfsOpenTasksContract.Tasks.COLUMN_LIST_ID + "=?"
     }
 }

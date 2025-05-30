@@ -17,6 +17,7 @@
 
 package com.android.calendar.datasource
 
+import com.android.calendar.persistence.tasks.DmfsOpenTasksContract
 import android.accounts.Account
 import android.app.Application
 import android.content.ContentResolver
@@ -38,17 +39,30 @@ class AccountDataSource(
     /**
      * TODO Document
      */
-    fun queryAccount(calendarId: Long): Account? {
-        val calendarUri =
-            ContentUris.withAppendedId(CalendarContract.Calendars.CONTENT_URI, calendarId)
-        contentResolver.query(calendarUri, ACCOUNT_PROJECTION, null, null, null)
-            ?.use {
-                if (it.moveToFirst()) {
-                    val accountName = it.getString(PROJECTION_ACCOUNT_INDEX_NAME)
-                    val accountType = it.getString(PROJECTION_ACCOUNT_INDEX_TYPE)
-                    return Account(accountName, accountType) // TODO Is this the right type?
+    fun queryAccount(calendarId: Long, isTask: Boolean): Account? {
+        if (isTask) {
+            val taskUri =
+                ContentUris.withAppendedId(DmfsOpenTasksContract.TaskLists.PROVIDER_URI, calendarId)
+            contentResolver.query(taskUri, ACCOUNT_PROJECTION, null, null, null)
+                ?.use {
+                    if (it.moveToFirst()) {
+                        val accountName = it.getString(PROJECTION_ACCOUNT_INDEX_NAME)
+                        val accountType = it.getString(PROJECTION_ACCOUNT_INDEX_TYPE)
+                        return Account(accountName, accountType)
+                    }
                 }
-            }
+        } else {
+            val calendarUri =
+                ContentUris.withAppendedId(CalendarContract.Calendars.CONTENT_URI, calendarId)
+            contentResolver.query(calendarUri, ACCOUNT_PROJECTION, null, null, null)
+                ?.use {
+                    if (it.moveToFirst()) {
+                        val accountName = it.getString(PROJECTION_ACCOUNT_INDEX_NAME)
+                        val accountType = it.getString(PROJECTION_ACCOUNT_INDEX_TYPE)
+                        return Account(accountName, accountType) // TODO Is this the right type?
+                    }
+                }
+        }
         return null
     }
 
