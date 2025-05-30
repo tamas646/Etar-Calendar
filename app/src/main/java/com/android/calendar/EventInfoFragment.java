@@ -224,22 +224,22 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
     private static final String PERIOD_SPACE = ". ";
     private static final String NO_EVENT_COLOR = "";
     // Query tokens for QueryHandler
-    private static final int TOKEN_QUERY_EVENT = 1;
-    private static final int TOKEN_QUERY_CALENDARS = 1 << 1;
-    private static final int TOKEN_QUERY_ATTENDEES = 1 << 2;
-    private static final int TOKEN_QUERY_DUPLICATE_CALENDARS = 1 << 3;
-    private static final int TOKEN_QUERY_REMINDERS = 1 << 4;
-    private static final int TOKEN_QUERY_VISIBLE_CALENDARS = 1 << 5;
-    private static final int TOKEN_QUERY_COLORS = 1 << 6;
-    private static final int TOKEN_QUERY_EXTENDED = 1 << 7;
-    private static final int TOKEN_QUERY_TASK = 3; // 1
-    private static final int TOKEN_QUERY_TASK_LIST = 7; // 2
-    private static final int TOKEN_QUERY_VISIBLE_TASK_LIST = 11 ; // 32
-    private static final int TOKEN_QUERY_DUPLICATE_TASK_LIST = 100; // 8
+    private static final int TOKEN_QUERY_EVENT = 1;                    // 00000001 - 1
+    private static final int TOKEN_QUERY_CALENDARS = 1 << 1;           // 00000010 - 2
+    private static final int TOKEN_QUERY_ATTENDEES = 1 << 2;           // 00000100 - 4
+    private static final int TOKEN_QUERY_DUPLICATE_CALENDARS = 1 << 3; // 00001000 - 8
+    private static final int TOKEN_QUERY_REMINDERS = 1 << 4;           // 00010000 - 16
+    private static final int TOKEN_QUERY_VISIBLE_CALENDARS = 1 << 5;   // 00100000 - 32
+    private static final int TOKEN_QUERY_COLORS = 1 << 6;              // 01000000 - 64
+    private static final int TOKEN_QUERY_EXTENDED = 1 << 7;            // 10000000 - 128
+    private static final int TOKEN_QUERY_TASK = 3;                     // 00000011 - 3
+    private static final int TOKEN_QUERY_TASK_LIST = 7;                // 00000111 - 7
+    private static final int TOKEN_QUERY_VISIBLE_TASK_LIST = 11 ;      // 00001011 - 11
+    private static final int TOKEN_QUERY_DUPLICATE_TASK_LIST = 100;    // 01100100 - 100
     private static final int TOKEN_QUERY_ALL = TOKEN_QUERY_DUPLICATE_CALENDARS
             | TOKEN_QUERY_ATTENDEES | TOKEN_QUERY_CALENDARS | TOKEN_QUERY_EVENT
             | TOKEN_QUERY_REMINDERS | TOKEN_QUERY_VISIBLE_CALENDARS | TOKEN_QUERY_COLORS
-            | TOKEN_QUERY_TASK | TOKEN_QUERY_VISIBLE_TASK_LIST | TOKEN_QUERY_DUPLICATE_TASK_LIST |TOKEN_QUERY_TASK_LIST;
+            | TOKEN_QUERY_EXTENDED;                                    // 11111111 - 255
 
     public static final File EXPORT_SDCARD_DIRECTORY = new File(
             Environment.getExternalStorageDirectory(), "CalendarEvents");
@@ -2638,6 +2638,12 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
                     } else {
                         sendAccessibilityEventIfQueryDone(TOKEN_QUERY_REMINDERS);
                     }
+
+                    // start extended query
+                    uri = CalendarContract.ExtendedProperties.CONTENT_URI;
+                    startQuery(TOKEN_QUERY_EXTENDED, null, uri, EXTENDED_PROJECTION,
+                            EXTENDED_WHERE, args, EXTENDED_SORT_ORDER);
+
                     break;
                 case TOKEN_QUERY_TASK_LIST:
                     mCalendarsCursor = Utils.matrixCursorFromCursor(cursor);
