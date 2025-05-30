@@ -939,7 +939,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         b.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mCanModifyCalendar) {
+                if (!mCanModifyCalendar || mIsTask) {
                     return;
                 }
                 mDeleteHelper =
@@ -955,7 +955,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         b.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mCanModifyCalendar) {
+                if (!mCanModifyCalendar || mIsTask) {
                     return;
                 }
                 showEventColorPickerDialog();
@@ -2015,14 +2015,14 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
                 });
             }
             View button;
-            if (mCanModifyCalendar) {
+            if (mCanModifyCalendar && !mIsTask) {
                 button = mView.findViewById(R.id.delete);
                 if (button != null) {
                     button.setEnabled(true);
                     button.setVisibility(View.VISIBLE);
                 }
             }
-            if (mCanModifyEvent) {
+            if (mCanModifyEvent && !mIsTask) {
                 button = mView.findViewById(R.id.edit);
                 if (button != null) {
                     button.setEnabled(true);
@@ -2050,16 +2050,16 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         MenuItem edit = mMenu.findItem(R.id.info_action_edit);
         MenuItem changeColor = mMenu.findItem(R.id.info_action_change_color);
         if (delete != null) {
-            delete.setVisible(mCanModifyCalendar);
-            delete.setEnabled(mCanModifyCalendar);
+            delete.setVisible(mCanModifyCalendar && !mIsTask);
+            delete.setEnabled(mCanModifyCalendar && !mIsTask);
         }
         if (edit != null) {
-            edit.setVisible(mCanModifyEvent);
-            edit.setEnabled(mCanModifyEvent);
+            edit.setVisible(mCanModifyEvent && !mIsTask);
+            edit.setEnabled(mCanModifyEvent && !mIsTask);
         }
         if (changeColor != null && mColors != null && mColors.length > 0) {
-            changeColor.setVisible(mCanModifyCalendar);
-            changeColor.setEnabled(mCanModifyCalendar);
+            changeColor.setVisible(mCanModifyCalendar && !mIsTask);
+            changeColor.setEnabled(mCanModifyCalendar && !mIsTask);
         }
     }
 
@@ -2708,7 +2708,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
                             Log.d("Color", "H:" + hsv[0] + ",S:" + hsv[1] + ",V:" + hsv[2]);
                         }
                     }
-                    if (mCanModifyCalendar) {
+                    if (mCanModifyCalendar && !mIsTask) {
                         View button = mView.findViewById(R.id.change_color);
                         if (button != null && mColors.length > 0) {
                             button.setEnabled(true);
