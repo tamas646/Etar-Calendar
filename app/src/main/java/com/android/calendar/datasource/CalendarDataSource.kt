@@ -88,7 +88,7 @@ class CalendarDataSource(
                 )
             }
         }
-        context.contentResolver.query(
+        contentResolver.query(
             DmfsOpenTasksContract.TaskLists.PROVIDER_URI,
             TASKLIST_PROJECTION,
             null,
@@ -98,7 +98,7 @@ class CalendarDataSource(
             while (it.moveToNext()) {
                 val id = it.getLong(0)
                 val accountName = it.getString(1)
-                val accountType = it.getString(2)More actions
+                val accountType = it.getString(2)
                 val name = it.getString(4)
                 val displayName = it.getString(4)
                 val color = it.getInt(5)

@@ -33,7 +33,7 @@ class EventDataSource(
     fun queryNumberOfEvents(calendarId: Long, isTask: Boolean): Long? {
         val args = arrayOf(calendarId.toString())
         if (isTask) {
-            val cursor = contentResolver.query(DmfsOpenTasksContract.Tasks.PROVIDER_URI, null, WHERE_COUNT_TASKS, args, null)
+            val cursor = application.contentResolver.query(DmfsOpenTasksContract.Tasks.PROVIDER_URI, null, WHERE_COUNT_TASKS, args, null)
             val count = cursor?.count?.toLong()
             cursor?.close()
             return count

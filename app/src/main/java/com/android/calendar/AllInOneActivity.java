@@ -972,7 +972,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         } else if (itemId == R.id.action_info) {
             checkAndRequestDisablingDoze();
         } else if (itemId == R.id.action_view_agenda_tasks || itemId == R.id.action_view_agenda_events) {
-            FragmentManager manager = getFragmentManager();
+            FragmentManager manager = getSupportFragmentManager();
             FragmentTransaction transaction = manager.beginTransaction();
             long millis = Utils.timeFromIntentInMillis(getIntent());
             AgendaFragment frag = new AgendaFragment(millis, false);
@@ -1513,7 +1513,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                             EventInfoFragment.DIALOG_WINDOW_STYLE,
                             null /* No reminders to explicitly pass in. */);
                     fragment.setDialogParams(event.x, event.y, mActionBar.getHeight());
-                    FragmentManager fm = getFragmentManager();
+                    FragmentManager fm = getSupportFragmentManager();
                     FragmentTransaction ft = fm.beginTransaction();
                     // if we have an old popup replace it
                     Fragment fOld = fm.findFragmentByTag(EVENT_INFO_FRAGMENT_TAG);

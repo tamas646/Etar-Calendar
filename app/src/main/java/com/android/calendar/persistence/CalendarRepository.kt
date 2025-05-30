@@ -69,11 +69,11 @@ internal class CalendarRepository(val application: Application) : ICalendarRepos
     override fun deleteLocalCalendar(accountName: String, id: Long): Boolean =
         calendarDataSource.deleteLocalCalendar(accountName, id)
 
-    override fun queryAccount(calendarId: Long): Account? =
-        accountDataSource.queryAccount(calendarId)
+    override fun queryAccount(calendarId: Long, isTask: Boolean): Account? =
+        accountDataSource.queryAccount(calendarId, isTask)
 
-    override fun queryNumberOfEvents(calendarId: Long): Long? =
-        eventDataSource.queryNumberOfEvents(calendarId)
+    override fun queryNumberOfEvents(calendarId: Long, isTask: Boolean): Long? =
+        eventDataSource.queryNumberOfEvents(calendarId, isTask)
 
     companion object {
         /**

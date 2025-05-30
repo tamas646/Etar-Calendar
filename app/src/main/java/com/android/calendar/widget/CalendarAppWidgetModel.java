@@ -164,7 +164,6 @@ class CalendarAppWidgetModel {
             if (!bucket.isEmpty()) {
                 // We don't show day header in today
                 if (day != mTodayJulianDay) {
-                    final Time recycle = new Time(timeZone);
                     final DayInfo dayInfo = populateDayInfo(day, recycle);
                     // Add the day header
                     final int dayIndex = mDayInfos.size();

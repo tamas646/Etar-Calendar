@@ -53,12 +53,12 @@ interface ICalendarRepository {
     /**
      * Query the owning account of a given calendar
      */
-    fun queryAccount(calendarId: Long): Account?
+    fun queryAccount(calendarId: Long, isTask: Boolean): Account?
 
     /**
      * TODO document
      */
-    fun queryNumberOfEvents(calendarId: Long): Long?
+    fun queryNumberOfEvents(calendarId: Long, isTask: Boolean): Long?
 
     companion object {
         /**
