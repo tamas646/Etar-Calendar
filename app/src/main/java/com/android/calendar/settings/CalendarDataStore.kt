@@ -64,7 +64,7 @@ class CalendarDataStore(activity: FragmentActivity, calendarId: Long, isTask: Bo
         }
     }
 
-    private fun mapPreferenceKeyToDatabaseKeyForTaskList(key: String?): String {
+    private fun mapPreferenceKeyToDatabaseKeyForTaskList(key: String): String {
         return when (key) {
             CalendarPreferences.SYNCHRONIZE_KEY -> DmfsOpenTasksContract.TaskLists.COLUMN_SYNC_ENABLE
             CalendarPreferences.VISIBLE_KEY -> DmfsOpenTasksContract.TaskLists.COLUMN_VISIBLE
@@ -143,7 +143,7 @@ class CalendarDataStore(activity: FragmentActivity, calendarId: Long, isTask: Bo
         return defValue
     }
 
-    private fun getValues(key: String?) : Map<String, Any> {
+    private fun getValues(key: String) : Map<String, Any> {
         var returnMap = HashMap<String, Any>();
         if (!isTask) {
             returnMap.put("databaseKey",mapPreferenceKeyToDatabaseKey(key))

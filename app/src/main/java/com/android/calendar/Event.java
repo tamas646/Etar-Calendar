@@ -36,7 +36,7 @@ import android.util.Log;
 import androidx.core.content.ContextCompat;
 
 import com.android.calendar.persistence.tasks.DmfsOpenTasksContract;
-import com.android.calendarcommon2.Time;
+import com.android.calendar.calendarcommon2.Time;
 import com.android.calendar.settings.GeneralPreferences;
 
 import org.dmfs.rfc5545.DateTime;

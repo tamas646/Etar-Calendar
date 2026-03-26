@@ -41,8 +41,10 @@ import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import androidx.core.content.ContextCompat;
 import com.android.calendar.Utils;
 import com.android.calendar.theme.DynamicThemeKt;
+import com.android.calendar.Event;
 import com.android.calendar.persistence.tasks.DmfsOpenTasksContract;
 import com.android.calendar.widget.CalendarAppWidgetModel.DayInfo;
 import com.android.calendar.widget.CalendarAppWidgetModel.EventInfo;
