@@ -23,8 +23,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.android.common.contacts.BaseEmailAddressAdapter;
-import com.android.ex.chips.AccountSpecifier;
+import com.android.calendar.common.contacts.BaseEmailAddressAdapter;
+import com.android.calendar.chips.AccountSpecifier;
 
 import ws.xsoh.etar.R;
 

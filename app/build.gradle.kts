@@ -1,31 +1,28 @@
-import com.android.build.gradle.internal.tasks.factory.dependsOn
-
 plugins {
-	id("com.android.application")
-	id("org.jetbrains.kotlin.android")
-	id("org.ec4j.editorconfig")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.ec4j.editorconfig)
 }
 
 editorconfig {
-	excludes = listOf("external/**", "metadata/**", "**/*.webp")
+	excludes = listOf("metadata/**", "**/*.xml", "**/*.webp")
+}
+
+kotlin {
+    jvmToolchain(21)
 }
 
 android {
 	namespace = "ws.xsoh.etar"
 	testNamespace = "com.android.calendar.tests"
-	compileSdk = 35
+	compileSdk = 36
 
 	defaultConfig {
 		minSdk = 23
-		targetSdk = 34
-		versionCode = 48
-		versionName = "1.0.48"
+		targetSdk = 36
+		versionCode = 53
+		versionName = "1.0.53"
 		applicationId = "ws.xsoh.etar"
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-	}
-
-	sourceSets {
-		named("main").get().java.srcDirs("../external/ex/common/java")
 	}
 
 	buildTypes {
@@ -54,6 +51,7 @@ android {
 	buildFeatures {
         buildConfig = true
 		viewBinding = true
+		resValues = true
 	}
 
 	/*
@@ -100,12 +98,8 @@ android {
 	compileOptions {
 		isCoreLibraryDesugaringEnabled = true
 
-		sourceCompatibility(JavaVersion.VERSION_17)
-		targetCompatibility(JavaVersion.VERSION_17)
-	}
-
-	kotlinOptions {
-		jvmTarget = "17"
+		sourceCompatibility(JavaVersion.VERSION_21)
+		targetCompatibility(JavaVersion.VERSION_21)
 	}
 
 	useLibrary("android.test.base")
@@ -120,27 +114,24 @@ android {
 dependencies {
 
 	// Core
-	implementation("androidx.core:core-ktx:1.15.0")
-	implementation(fileTree("include" to arrayOf("*.jar", "*.aar"), "dir" to "libs"))
-	implementation("androidx.preference:preference-ktx:1.2.1")
-	implementation("androidx.appcompat:appcompat:1.7.0")
-	implementation("androidx.constraintlayout:constraintlayout:2.2.0")
-	implementation("com.google.android.material:material:1.12.0")
-	testImplementation("junit:junit:4.13.2")
+	implementation(libs.androidx.core)
+	implementation(libs.androidx.preference)
+	implementation(libs.androidx.appcompat)
+	implementation(libs.androidx.constraintlayout)
+	implementation(libs.google.android.material)
+    implementation(libs.androidx.work.runtime)
+    implementation(libs.androidx.concurrent.futures)
+    testImplementation(libs.junit)
+	testImplementation(libs.androidx.test.runner)
 
-	coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.3")
+	coreLibraryDesugaring(libs.android.tools.desugar)
 
 	// Coroutines
-	val coroutines_version = "1.9.0"
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version")
+	implementation(libs.kotlinx.coroutines.android)
 
 	// https://mvnrepository.com/artifact/org.dmfs/lib-recur
-	implementation("org.dmfs:lib-recur:0.17.1")
+	implementation(libs.dmfs.lib.recur)
 
 	// lifecycle
-	val lifecycle_version = "2.8.7"
-	implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
+	implementation(libs.androidx.lifecycle.livedata)
 }
-
-tasks.preBuild.dependsOn(":aarGen")

@@ -41,15 +41,13 @@ import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import androidx.core.content.ContextCompat;
-import com.android.calendar.DynamicTheme;
-import com.android.calendar.Event;
 import com.android.calendar.Utils;
+import com.android.calendar.theme.DynamicThemeKt;
 import com.android.calendar.persistence.tasks.DmfsOpenTasksContract;
 import com.android.calendar.widget.CalendarAppWidgetModel.DayInfo;
 import com.android.calendar.widget.CalendarAppWidgetModel.EventInfo;
 import com.android.calendar.widget.CalendarAppWidgetModel.RowInfo;
-import com.android.calendarcommon2.Time;
+import com.android.calendar.calendarcommon2.Time;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -314,7 +312,7 @@ public class CalendarAppWidgetService extends RemoteViewsService {
                     int past_bg_color = R.color.agenda_past_days_bar_background_color;
                     views.setInt(R.id.widget_row, "setBackgroundResource", past_bg_color);
                 } else {
-                    int future_bg_color = DynamicTheme.getWidgetBackgroundStyle(mContext);
+                    int future_bg_color = DynamicThemeKt.getWidgetBackgroundStyle(mContext);
                     views.setInt(R.id.widget_row, "setBackgroundResource", future_bg_color);
                 }
 

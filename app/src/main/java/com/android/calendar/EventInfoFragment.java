@@ -122,12 +122,12 @@ import com.android.calendar.icalendar.VEvent;
 import com.android.calendar.icalendar.VTodo;
 import com.android.calendar.persistence.tasks.DmfsOpenTasksContract;
 import com.android.calendar.settings.GeneralPreferences;
-import com.android.calendarcommon2.DateException;
-import com.android.calendarcommon2.Duration;
-import com.android.calendarcommon2.EventRecurrence;
-import com.android.calendarcommon2.Time;
-import com.android.colorpicker.ColorPickerSwatch.OnColorSelectedListener;
-import com.android.colorpicker.HsvColorComparator;
+import com.android.calendar.calendarcommon2.DateException;
+import com.android.calendar.calendarcommon2.Duration;
+import com.android.calendar.calendarcommon2.EventRecurrence;
+import com.android.calendar.calendarcommon2.Time;
+import com.android.calendar.colorpicker.ColorPickerSwatch.OnColorSelectedListener;
+import com.android.calendar.colorpicker.HsvColorComparator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -611,8 +611,8 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         int size = vals.length;
         ArrayList<Integer> list = new ArrayList<Integer>(size);
 
-        for (int i = 0; i < size; i++) {
-            list.add(vals[i]);
+        for (int val : vals) {
+            list.add(val);
         }
 
         return list;
@@ -633,8 +633,6 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
             sendAccessibilityEvent();
         }
     }
-
-    private final DynamicTheme dynamicTheme = new DynamicTheme();
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -669,7 +667,6 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
 
         final Activity activity = getActivity();
         mContext = activity;
-        dynamicTheme.onCreate(activity);
         mColorPickerDialog = (EventColorPickerDialog) mActivity.getSupportFragmentManager()
                 .findFragmentByTag(COLOR_PICKER_DIALOG_TAG);
         if (mColorPickerDialog != null) {

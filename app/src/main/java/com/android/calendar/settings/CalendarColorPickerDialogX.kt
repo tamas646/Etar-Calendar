@@ -27,11 +27,12 @@ import android.os.Bundle
 import android.provider.CalendarContract.Calendars
 import android.provider.CalendarContract.Colors
 import android.util.SparseIntArray
-import androidx.appcompat.app.AlertDialog
 import com.android.calendar.AsyncQueryService
 import com.android.calendar.Utils
-import com.android.colorpicker.ColorPickerSwatch.OnColorSelectedListener
-import com.android.colorpicker.HsvColorComparator
+import com.android.calendar.colorpicker.ColorPickerDialog
+import com.android.calendar.colorpicker.ColorPickerSwatch.OnColorSelectedListener
+import com.android.calendar.colorpicker.HsvColorComparator
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ws.xsoh.etar.R
 import java.util.ArrayList
 import java.util.Arrays
@@ -39,11 +40,11 @@ import java.util.Arrays
 
 /**
  * Based on CalendarColorPickerDialog.java
- * - extends ColorPickerDialogX for androidx compatibility
+ * - extends ColorPickerDialog for androidx compatibility
  * - added OnCalendarColorSelectedListener
  * - handle calendars where no additional colors are provided by the account
  */
-class CalendarColorPickerDialogX : ColorPickerDialogX() {
+class CalendarColorPickerDialogX : ColorPickerDialog() {
     private var queryService: QueryService? = null
     private val colorKeyMap = SparseIntArray()
     private var calendarId: Long = 0
@@ -194,7 +195,7 @@ class CalendarColorPickerDialogX : ColorPickerDialogX() {
     }
 
     private fun useDefaultColors() {
-        val warningDialog = AlertDialog.Builder(requireActivity())
+        val warningDialog = MaterialAlertDialogBuilder(requireActivity())
                 .setTitle(R.string.preferences_calendar_color_warning_title)
                 .setMessage(R.string.preferences_calendar_color_warning_message)
                 .setPositiveButton(R.string.preferences_calendar_color_warning_button) { dialogInterface, _ ->

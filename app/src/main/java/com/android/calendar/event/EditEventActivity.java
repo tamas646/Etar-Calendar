@@ -27,6 +27,7 @@ import android.provider.CalendarContract.Events;
 import android.util.Log;
 import android.view.MenuItem;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -34,9 +35,9 @@ import com.android.calendar.AbstractCalendarActivity;
 import com.android.calendar.CalendarController;
 import com.android.calendar.CalendarController.EventInfo;
 import com.android.calendar.CalendarEventModel.ReminderEntry;
-import com.android.calendar.DynamicTheme;
 import com.android.calendar.Utils;
-import com.android.calendarcommon2.Time;
+import com.android.calendar.theme.DynamicThemeKt;
+import com.android.calendar.calendarcommon2.Time;
 
 import java.util.ArrayList;
 
@@ -52,7 +53,6 @@ public class EditEventActivity extends AbstractCalendarActivity {
     private static final String BUNDLE_KEY_EVENT_ID = "key_event_id";
 
     private static boolean mIsMultipane;
-    private final DynamicTheme dynamicTheme = new DynamicTheme();
     private EditEventFragment mEditFragment;
 
     private ArrayList<ReminderEntry> mReminders;
@@ -65,9 +65,9 @@ public class EditEventActivity extends AbstractCalendarActivity {
 
     @Override
     protected void onCreate(Bundle icicle) {
+        DynamicThemeKt.applyTheme(this);
         super.onCreate(icicle);
 
-        dynamicTheme.onCreate(this);
         mEventInfo = getEventInfoFromIntent(icicle);
         mReminders = getReminderEntriesFromIntent();
         mEventColorInitialized = getIntent().hasExtra(EXTRA_EVENT_COLOR);
@@ -114,6 +114,19 @@ public class EditEventActivity extends AbstractCalendarActivity {
             ft.show(mEditFragment);
             ft.commit();
         }
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (mEditFragment != null) {
+                    mEditFragment.onBackPressed();
+                } else {
+                    if (isEnabled()) {
+                        finish();
+                    }
+                }
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -172,19 +185,9 @@ public class EditEventActivity extends AbstractCalendarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
+            getOnBackPressedDispatcher().onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (mEditFragment != null) {
-            mEditFragment.onBackPressed();
-            return;
-        }
-
-        super.onBackPressed();
     }
 }

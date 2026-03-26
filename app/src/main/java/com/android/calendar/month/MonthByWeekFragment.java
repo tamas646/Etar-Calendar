@@ -51,12 +51,12 @@ import com.android.calendar.CalendarController;
 import com.android.calendar.CalendarController.EventInfo;
 import com.android.calendar.CalendarController.EventType;
 import com.android.calendar.CalendarController.ViewType;
-import com.android.calendar.DynamicTheme;
+import com.android.calendar.theme.DynamicThemeKt;
 import com.android.calendar.Event;
 import com.android.calendar.Utils;
 import com.android.calendar.event.CreateEventDialogFragment;
 import com.android.calendar.persistence.tasks.DmfsOpenTasksContract;
-import com.android.calendarcommon2.Time;
+import com.android.calendar.calendarcommon2.Time;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -312,7 +312,7 @@ public class MonthByWeekFragment extends SimpleDayPickerFragment implements
         mListView.setOnTouchListener(this);
 
         if (!mIsMiniMonth) {
-            mListView.setBackgroundColor(DynamicTheme.getColor(getActivity(), "month_bgcolor"));
+            mListView.setBackgroundColor(DynamicThemeKt.getColor(getActivity(), "month_bgcolor"));
         }
 
         // To get a smoother transition when showing this fragment, delay loading of events until

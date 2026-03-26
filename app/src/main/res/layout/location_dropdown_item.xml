@@ -29,7 +29,7 @@
         android:layout_height="48dip"
         android:padding="2dp"
         android:layout_marginStart="4dp"
-        android:src="@drawable/ic_baseline_account_circle"
+        android:src="@drawable/outline_account_circle"
         app:shapeAppearanceOverlay="@style/locationIconRounded"
         android:cropToPadding="true"
         android:scaleType="centerCrop"/>
@@ -41,7 +41,7 @@
         android:orientation="vertical"
         android:layout_weight="1">
         <TextView android:id="@+id/location_name"
-                  android:textColor="?attr/light_dark"
+                  android:textColor="?android:attr/textColorPrimary"
                   android:textSize="18sp"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"

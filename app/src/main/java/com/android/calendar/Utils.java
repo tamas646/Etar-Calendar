@@ -22,7 +22,6 @@ import android.Manifest;
 import android.accounts.Account;
 import android.app.Activity;
 import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -65,7 +64,7 @@ import com.android.calendar.CalendarEventModel.ReminderEntry;
 import com.android.calendar.CalendarUtils.TimeZoneUtils;
 import com.android.calendar.settings.GeneralPreferences;
 import com.android.calendar.widget.CalendarAppWidgetProvider;
-import com.android.calendarcommon2.Time;
+import com.android.calendar.calendarcommon2.Time;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -117,7 +116,6 @@ public class Utils {
     public static final int YEAR_MAX = 2036;
     public static final String KEY_QUICK_RESPONSES = "preferences_quick_responses";
     public static final String APPWIDGET_DATA_TYPE = "vnd.android.data/update";
-    public static final int PI_FLAG_IMMUTABLE = Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0;
 
     // Defines used by the DNA generation code
     static final int DAY_IN_MINUTES = 60 * 24;
@@ -2253,7 +2251,6 @@ public class Utils {
     }
 
     public static boolean isCalendarPermissionGranted(Context context, boolean showWarningToast) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true;
         if (ContextCompat.checkSelfPermission(context,
                 Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
             return true;

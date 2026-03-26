@@ -19,7 +19,6 @@ package com.android.calendar.alerts;
 
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.app.TaskStackBuilder;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
@@ -48,10 +47,13 @@ import android.text.style.URLSpan;
 import android.util.Log;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
-import com.android.calendar.DynamicTheme;
+import androidx.core.content.ContextCompat;
+
+import com.android.calendar.theme.DynamicThemeKt;
 import com.android.calendar.EventInfoActivity;
 import com.android.calendar.Utils;
 import com.android.calendar.alerts.AlertService.NotificationWrapper;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -115,51 +117,6 @@ public class AlertReceiver extends BroadcastReceiver {
         sAsyncHandler = new Handler(thr.getLooper());
     }
 
-    /**
-     * Start the service to process the current event notifications, acquiring
-     * the wake lock before returning to ensure that the service will run.
-     */
-    public static void beginStartingService(Context context, Intent intent) {
-        synchronized (mStartingServiceSync) {
-            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-
-            if (mStartingService == null) {
-                mStartingService = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                        "Etar:StartingAlertService");
-                mStartingService.setReferenceCounted(false);
-            }
-            mStartingService.acquire();
-
-            if (pm.isIgnoringBatteryOptimizations(context.getPackageName())) {
-                if (Utils.isOreoOrLater()) {
-                    if (Utils.isUpsideDownCakeOrLater() && !Utils.canScheduleAlarms(context)) {
-                        return;
-                    }
-                    context.startForegroundService(intent);
-                } else {
-                    context.startService(intent);
-                }
-            } else {
-                Log.d(TAG, "Battery optimizations are not disabled");
-            }
-
-        }
-    }
-
-    /**
-     * Called back by the service when it has finished processing notifications,
-     * releasing the wake lock if the service is now stopping.
-     */
-    public static void finishStartingService(Service service, int startId) {
-        synchronized (mStartingServiceSync) {
-            if (mStartingService != null) {
-                if (service.stopSelfResult(startId)) {
-                    mStartingService.release();
-                }
-            }
-        }
-    }
-
     private static PendingIntent createClickEventIntent(Context context, long eventId,
         int notificationId, long startMillis, long endMillis) {
         Intent intent = AlertUtils.buildEventViewIntent(context, eventId, startMillis, endMillis);
@@ -167,7 +124,7 @@ public class AlertReceiver extends BroadcastReceiver {
         return TaskStackBuilder.create(context)
             .addParentStack(EventInfoActivity.class)
             .addNextIntent(intent)
-            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT | Utils.PI_FLAG_IMMUTABLE);
+            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     private static PendingIntent createDeleteEventIntent(Context context, long eventId,
@@ -195,7 +152,7 @@ public class AlertReceiver extends BroadcastReceiver {
         ContentUris.appendId(builder, eventId);
         ContentUris.appendId(builder, startMillis);
         intent.setData(builder.build());
-        return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | Utils.PI_FLAG_IMMUTABLE);
+        return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     // if default snooze minute < 0, means the snooze option is disable
@@ -221,10 +178,10 @@ public class AlertReceiver extends BroadcastReceiver {
 
         if (Utils.useCustomSnoozeDelay(context)) {
             intent.setClass(context, SnoozeDelayActivity.class);
-            return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | Utils.PI_FLAG_IMMUTABLE);
+            return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         } else {
             intent.setClass(context, SnoozeAlarmsService.class);
-            return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | Utils.PI_FLAG_IMMUTABLE);
+            return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         }
     }
 
@@ -233,7 +190,7 @@ public class AlertReceiver extends BroadcastReceiver {
         clickIntent.setClass(context, AlertActivity.class);
         clickIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return PendingIntent.getActivity(context, 0, clickIntent,
-                    PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT | Utils.PI_FLAG_IMMUTABLE);
+                    PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     public static NotificationWrapper makeBasicNotification(Context context, String title,
@@ -249,7 +206,7 @@ public class AlertReceiver extends BroadcastReceiver {
         final PackageManager packageManager = context.getPackageManager();
         List<ResolveInfo> resolveInfo = packageManager.queryIntentActivities(intent,
                 PackageManager.MATCH_DEFAULT_ONLY);
-        return (resolveInfo.size() > 0);
+        return (!resolveInfo.isEmpty());
     }
 
     private static Notification buildBasicNotification(Notification.Builder notificationBuilder,
@@ -257,7 +214,7 @@ public class AlertReceiver extends BroadcastReceiver {
             long eventId, long calendarId, int notificationId, boolean doPopup, int priority,
             boolean addActionButtons) {
         Resources resources = context.getResources();
-        if (title == null || title.length() == 0) {
+        if (title == null || title.isEmpty()) {
             title = resources.getString(R.string.no_title_label);
         }
 
@@ -274,8 +231,8 @@ public class AlertReceiver extends BroadcastReceiver {
         notificationBuilder.setContentTitle(title);
         notificationBuilder.setContentText(summaryText);
         notificationBuilder.setSmallIcon(R.drawable.stat_notify_calendar_events);
-        int color = DynamicTheme.getColorId(DynamicTheme.getPrimaryColor(context));
-        notificationBuilder.setColor(context.getResources().getColor(color));
+        int color = DynamicThemeKt.getColorId(DynamicThemeKt.getPrimaryColor(context));
+        notificationBuilder.setColor(ContextCompat.getColor(context, color));
         notificationBuilder.setContentIntent(clickIntent);
         notificationBuilder.setDeleteIntent(deleteIntent);
 
@@ -415,7 +372,7 @@ public class AlertReceiver extends BroadcastReceiver {
         deleteIntent.putExtra(AlertUtils.EVENT_IDS_KEY, eventIds);
         deleteIntent.putExtra(AlertUtils.EVENT_STARTS_KEY, startMillis);
         PendingIntent pendingDeleteIntent = PendingIntent.getService(context, 0, deleteIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | Utils.PI_FLAG_IMMUTABLE);
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         if (digestTitle == null || digestTitle.length() == 0) {
             digestTitle = res.getString(R.string.no_title_label);
@@ -552,7 +509,7 @@ public class AlertReceiver extends BroadcastReceiver {
                         broadcastIntent.putExtra(EXTRA_EVENT_ID, eventId);
                         return PendingIntent.getBroadcast(context,
                                 Long.valueOf(eventId).hashCode(), broadcastIntent,
-                                PendingIntent.FLAG_CANCEL_CURRENT | Utils.PI_FLAG_IMMUTABLE);
+                                PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
                     }
                 } while (attendeesCursor.moveToNext());
             }
@@ -676,8 +633,7 @@ public class AlertReceiver extends BroadcastReceiver {
      */
     private static PendingIntent createMapBroadcastIntent(Context context, URLSpan[] urlSpans,
             long eventId) {
-        for (int span_i = 0; span_i < urlSpans.length; span_i++) {
-            URLSpan urlSpan = urlSpans[span_i];
+        for (URLSpan urlSpan : urlSpans) {
             String urlString = urlSpan.getURL();
             if (urlString.startsWith(GEO_PREFIX)) {
                 Intent geoIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlString));
@@ -690,7 +646,7 @@ public class AlertReceiver extends BroadcastReceiver {
                         if (geoIntent != null) {
                             taskStackBuilder.addNextIntentWithParentStack(geoIntent);
                             return taskStackBuilder.getPendingIntent(0,
-                                    PendingIntent.FLAG_UPDATE_CURRENT | Utils.PI_FLAG_IMMUTABLE);
+                                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
                         }
                     }
                     Intent broadcastIntent = new Intent(MAP_ACTION);
@@ -698,7 +654,7 @@ public class AlertReceiver extends BroadcastReceiver {
                     broadcastIntent.putExtra(EXTRA_EVENT_ID, eventId);
                     return PendingIntent.getBroadcast(context,
                             Long.valueOf(eventId).hashCode(), broadcastIntent,
-                            PendingIntent.FLAG_CANCEL_CURRENT | Utils.PI_FLAG_IMMUTABLE);
+                            PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
                 }
             }
         }
@@ -712,8 +668,7 @@ public class AlertReceiver extends BroadcastReceiver {
      * If no links are found, return null.
      */
     private static Intent createMapActivityIntent(Context context, URLSpan[] urlSpans) {
-        for (int span_i = 0; span_i < urlSpans.length; span_i++) {
-            URLSpan urlSpan = urlSpans[span_i];
+        for (URLSpan urlSpan : urlSpans) {
             String urlString = urlSpan.getURL();
             if (urlString.startsWith(GEO_PREFIX)) {
                 Intent geoIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlString));
@@ -740,8 +695,7 @@ public class AlertReceiver extends BroadcastReceiver {
             return null;
         }
 
-        for (int span_i = 0; span_i < urlSpans.length; span_i++) {
-            URLSpan urlSpan = urlSpans[span_i];
+        for (URLSpan urlSpan : urlSpans) {
             String urlString = urlSpan.getURL();
             if (urlString.startsWith(TEL_PREFIX)) {
                 Intent broadcastIntent = new Intent(CALL_ACTION);
@@ -749,7 +703,7 @@ public class AlertReceiver extends BroadcastReceiver {
                 broadcastIntent.putExtra(EXTRA_EVENT_ID, eventId);
                 return PendingIntent.getBroadcast(context,
                         Long.valueOf(eventId).hashCode(), broadcastIntent,
-                        PendingIntent.FLAG_CANCEL_CURRENT | Utils.PI_FLAG_IMMUTABLE);
+                        PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             }
         }
 
@@ -770,8 +724,7 @@ public class AlertReceiver extends BroadcastReceiver {
             return null;
         }
 
-        for (int span_i = 0; span_i < urlSpans.length; span_i++) {
-            URLSpan urlSpan = urlSpans[span_i];
+        for (URLSpan urlSpan : urlSpans) {
             String urlString = urlSpan.getURL();
             if (urlString.startsWith(TEL_PREFIX)) {
                 Intent callIntent = new Intent(Intent.ACTION_DIAL, Uri.parse(urlString));
@@ -788,6 +741,8 @@ public class AlertReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, final Intent intent) {
         if (context == null || intent.getAction() == null)
             return;
+
+        String action = intent.getAction();
 
         if (AlertService.DEBUG) {
             Log.d(TAG, "onReceive: a=" + intent.getAction() + " " + intent);
@@ -848,17 +803,7 @@ public class AlertReceiver extends BroadcastReceiver {
                 context.startActivity(i);
             }
         } else {
-            Intent i = new Intent();
-            i.setClass(context, AlertService.class);
-            i.putExtras(intent);
-            i.putExtra("action", intent.getAction());
-            Uri uri = intent.getData();
-
-
-            if (uri != null) {
-                i.putExtra("uri", uri.toString());
-            }
-            beginStartingService(context, i);
+            AlertUtils.scheduleAlertWorker(context, action);
         }
     }
 

@@ -36,9 +36,9 @@ import android.widget.TextView;
 
 import androidx.fragment.app.ListFragment;
 
-import com.android.calendar.DynamicTheme;
+import com.android.calendar.theme.DynamicThemeKt;
 import com.android.calendar.Utils;
-import com.android.calendarcommon2.Time;
+import com.android.calendar.calendarcommon2.Time;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -170,9 +170,9 @@ public class SimpleDayPickerFragment extends ListFragment implements OnScrollLis
         mTempTime.setTimezone(tz);
 
         Context c = getActivity();
-        mSaturdayColor = DynamicTheme.getColor(c, "month_saturday");
-        mSundayColor = DynamicTheme.getColor(c, "month_sunday");
-        mDayNameColor = DynamicTheme.getColor(c, "month_day_names_color");
+        mSaturdayColor = DynamicThemeKt.getColor(c, "month_saturday");
+        mSundayColor = DynamicThemeKt.getColor(c, "month_sunday");
+        mDayNameColor = DynamicThemeKt.getColor(c, "month_day_names_color");
 
         // Adjust sizes for screen density
         if (mScale == 0) {

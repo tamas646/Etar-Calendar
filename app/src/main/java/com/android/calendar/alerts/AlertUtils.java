@@ -36,9 +36,14 @@ import android.text.format.DateUtils;
 import android.util.Log;
 
 import androidx.core.content.ContextCompat;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+
 import com.android.calendar.EventInfoActivity;
 import com.android.calendar.Utils;
-import com.android.calendarcommon2.Time;
+import com.android.calendar.calendarcommon2.Time;
 
 import java.util.Locale;
 import java.util.Map;
@@ -133,7 +138,7 @@ public class AlertUtils {
 
         intent.putExtra(CalendarContract.CalendarAlerts.ALARM_TIME, alarmTime);
         PendingIntent pi = PendingIntent.getBroadcast(context, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | Utils.PI_FLAG_IMMUTABLE);
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         manager.set(alarmType, alarmTime, pi);
     }
 
@@ -349,5 +354,30 @@ public class AlertUtils {
         int startDay = Time.getJulianDay(startMillis, timeObj.getGmtOffset());
         timeObj.set(endMillis);
         return Time.getJulianDay(endMillis, timeObj.getGmtOffset()) - startDay;
+    }
+
+    /**
+     * Queues the AlertWorker with a specific action and a REPLACE policy
+     *
+     * @param context The application context.
+     * @param action The action to be triggered, e.g., Intent.ACTION_TIME_CHANGED.
+     */
+    public static void scheduleAlertWorker(Context context, String action) {
+        // Create input data for the worker
+        Data inputData = new Data.Builder()
+                .putString(AlertWorker.KEY_ACTION, action)
+                .build();
+
+        // Create a work request
+        OneTimeWorkRequest alertWorkRequest = new OneTimeWorkRequest.Builder(AlertWorker.class)
+                .setInputData(inputData)
+                .addTag("alert_processing_work")
+                .build();
+
+        // Queue work to avoid duplicates
+        WorkManager.getInstance(context).enqueueUniqueWork(
+                "CalendarAlertProcessing",
+                ExistingWorkPolicy.REPLACE,
+                alertWorkRequest);
     }
 }

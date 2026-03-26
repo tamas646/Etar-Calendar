@@ -57,8 +57,8 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.android.calendar.Utils;
-import com.android.calendarcommon2.EventRecurrence;
-import com.android.calendarcommon2.Time;
+import com.android.calendar.calendarcommon2.EventRecurrence;
+import com.android.calendar.calendarcommon2.Time;
 
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
@@ -340,6 +340,10 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
                     model.endDate.switchTimezone(Time.TIMEZONE_UTC);
                     model.endDate.normalize();
                     er.until = model.endDate.format2445();
+                    if (!er.until.endsWith("Z")) {
+                        // Safeguard to not create invalid data
+                        throw new IllegalStateException("UNTIL parameter not in UTC");
+                    }
                     er.count = 0;
                 } else {
                     throw new IllegalStateException("end = END_BY_DATE but endDate is null");
